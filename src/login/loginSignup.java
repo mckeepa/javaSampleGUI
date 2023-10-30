@@ -4,6 +4,21 @@
  */
 package login;
 
+import java.io.File;
+import javax.swing.JFileChooser;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+
+
 /**
  *
  * @author PaulM
@@ -30,6 +45,7 @@ public class loginSignup extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jPanelRight = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Logon");
@@ -64,6 +80,13 @@ public class loginSignup extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(0, 102, 102));
         jLabel1.setText("Login");
 
+        jButton1.setText("jButtonOpenFile");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanelRightLayout = new javax.swing.GroupLayout(jPanelRight);
         jPanelRight.setLayout(jPanelRightLayout);
         jPanelRightLayout.setHorizontalGroup(
@@ -72,13 +95,19 @@ public class loginSignup extends javax.swing.JFrame {
                 .addGap(88, 88, 88)
                 .addComponent(jLabel1)
                 .addContainerGap(217, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelRightLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(133, 133, 133))
         );
         jPanelRightLayout.setVerticalGroup(
             jPanelRightLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanelRightLayout.createSequentialGroup()
                 .addGap(63, 63, 63)
                 .addComponent(jLabel1)
-                .addContainerGap(289, Short.MAX_VALUE))
+                .addGap(30, 30, 30)
+                .addComponent(jButton1)
+                .addContainerGap(236, Short.MAX_VALUE))
         );
 
         jPanel1.add(jPanelRight);
@@ -103,6 +132,66 @@ public class loginSignup extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        List<Client> clients = new ArrayList<Client>();
+        List < String > linesInFile = null ;
+ 
+        /// **************************
+        /// Select the file to process
+        /// **************************
+        System.out.println("The current panel is " + jPanelRight);
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Comma seperated files", "csv");    
+        chooser.setFileFilter(filter);
+        chooser.setSelectedFile(new File("client_income.csv"));
+        int option = chooser.showOpenDialog(this);
+        
+        /// **************************
+        /// Read the file 
+        /// **************************
+        if (option == JFileChooser.APPROVE_OPTION) {
+            Path filePath = Paths.get(chooser.getSelectedFile().getPath());
+            try {
+                linesInFile = Files.readAllLines(filePath, StandardCharsets.UTF_8);
+            } catch (IOException ex) {
+                Logger.getLogger(loginSignup.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            // for debugging purpose
+            linesInFile.forEach(line -> System.out.println(line));
+        }
+
+        /// **************************
+        /// Create Client Records from line in the file 
+        /// **************************
+        for (String clientRow : linesInFile)
+        {
+            String[] clientItems = clientRow.split(",");
+            var client = new Client();
+            client.Name = clientItems[0];
+            client.income =Integer.parseInt(clientItems[1].trim());
+            clients.add(client);
+        }
+
+        /// **************************
+        // Calculate income tax
+        /// **************************
+        clients.forEach(client -> 
+                client.TaxPayable = TaxProcessing.CaluateTax(client.income)
+        );
+
+        /// **************************
+        // Wite file to CSV
+        /// **************************
+            
+        // todo : it just pints to debug window now
+        System.out.println(clients); 
+            
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -134,12 +223,14 @@ public class loginSignup extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new loginSignup().setVisible(true);
+                 new loginSignup().setVisible(true);
+                
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
