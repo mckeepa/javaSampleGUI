@@ -7,13 +7,13 @@
  *
  * @author PaulM
  */
-package login;
+package taxPayment.data;
 
 public class Client {
 
-    String Name;
-    int income;
-    int TaxPayable;
+    public String Name;
+    public int income;
+    public int TaxPayable;
   
 }
 
