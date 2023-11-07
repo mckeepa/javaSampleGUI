@@ -12,6 +12,7 @@ import java.util.ArrayList;
  */
 public class TaxProcessing {
     public void TaxProcessing(){
+        
     }
     public static  int CaluateTax(int TaxableIncome){
         int taxPayable =0;
